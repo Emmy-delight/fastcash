@@ -34,7 +34,6 @@ export default function GetLoan () {
                             {duration.map(item =>
                             <li key={item.id}
                               onClick={()=>{
-                                setClickedRate(item.id)
                                 if (item.days === 30) {
                                     setRate(10)
                                 }else if(item.days === 60) {
