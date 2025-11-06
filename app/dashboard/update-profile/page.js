@@ -3,7 +3,7 @@ import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/mater
 export default function UpdateProfile () {
     return (
         <main className="min-h-screen flex justify-center py-4 md:py-6 md:px-12 lg:py-8 lg:px-16">
-            <div className="w-full md:w-[500px] h-[400px] rounded-md  shadow-md px-4 py-6">
+            <div className="w-full md:w-[500px] h-[450px] rounded-md  shadow-md px-4 py-6">
                 <h1 className="text-2xl font-bold text-gray-800 text-center mb-4">Update Your Profile</h1>
                 <form className="flex flex-col gap-3">
                     <div>
@@ -78,8 +78,8 @@ export default function UpdateProfile () {
                          size="small"
                         />
                     </div>
-                   
-
+                    <button type="submit" className="w-full h-10 rounded-md bg-indigo-500 text-white cursor-pointer">Update</button>
+                
                 </form>
 
             </div>
