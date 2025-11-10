@@ -3,6 +3,17 @@ import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/mater
 import { useFormik } from "formik";
 import * as yup from "yup";
 
+ const schema = yup.object().shape({
+    fullname: yup.string().required("fullName is required").min(5),
+    bvn: yup.number().required("Bvn is rquired").min(12),
+    nin: yup.number().required('Nin is required').min(11),
+    dob: yup.date().required("Date of birth is required"),
+    phone: yup.number().required("Phone number is required").min(11),
+    gender: yup.string().oneOf(["male","female"]).required("Gender is required"),
+    address: yup.string().required("Address is required").min(10),
+
+ })
+
 export default function UpdateProfile () {
 const {handleSubmit,handleChange,touched,errors,values} = useFormik({
     initialValues: {
@@ -14,14 +25,18 @@ const {handleSubmit,handleChange,touched,errors,values} = useFormik({
         gender: "",
         address: "",
     },
-    onSubmit: ()=>{},
+    onSubmit: ()=>{
+        alert("Profile updated");
+        alert(`welcome ${values.fullname}`);
+    },
+    validationSchema: schema,
 })
-
     return (
         <main className="min-h-screen flex justify-center py-4 md:py-6 md:px-12 lg:py-8 lg:px-16">
             <div className="w-full md:w-[500px] h-[450px] rounded-md  shadow-md px-4 py-6">
                 <h1 className="text-2xl font-bold text-gray-800 text-center mb-4">Update Your Profile</h1>
-                <form className="flex flex-col gap-3">
+                <form onSubmit={handleSubmit}
+                 className="flex flex-col gap-3">
                     <div>
                         <TextField
                         fullWidth
@@ -33,8 +48,10 @@ const {handleSubmit,handleChange,touched,errors,values} = useFormik({
                         onChange={handleChange}
                         size="small"
                         />
+                        {touched.fullname&&errors.fullname ?<span className="text-xs text-red-500">{errors.fullname}</span> : null}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
                         <TextField
                         fullWidth
                         type="number"
@@ -45,6 +62,9 @@ const {handleSubmit,handleChange,touched,errors,values} = useFormik({
                         onChange={handleChange}
                         size="small"
                         />
+                        {touched.bvn&&errors.bvn ?<span className="text-xs text-red-500">{errors.bvn}</span> : null}
+                       </div> 
+                       <div>
                         <TextField
                           fullWidth
                           type="number"
@@ -55,8 +75,11 @@ const {handleSubmit,handleChange,touched,errors,values} = useFormik({
                           onChange={handleChange}
                           size="small"
                         />
+                        {touched.nin&&errors.nin ?<span className="text-xs text-red-500">{errors.nin}</span> : null}
+                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                       <div> 
                         <TextField
                         fullWidth
                         InputLabelProps={{shrink:true}}
@@ -68,6 +91,9 @@ const {handleSubmit,handleChange,touched,errors,values} = useFormik({
                         onChange={handleChange}
                         size="small"
                         />
+                        {touched.dob&&errors.dob ?<span className="text-xs text-red-500">{errors.dob}</span> : null}
+                       </div>
+                       <div>
                         <TextField
                          fullWidth
                          type="tel"
@@ -78,6 +104,8 @@ const {handleSubmit,handleChange,touched,errors,values} = useFormik({
                          onChange={handleChange}
                          size="small"
                         />
+                        {touched.phone&&errors.phone ?<span className="text-xs text-red-500">{errors.phone}</span> : null}
+                       </div>
                     </div>
                     <FormControl>
                         <InputLabel id="gender-label">Gender</InputLabel>
@@ -93,6 +121,7 @@ const {handleSubmit,handleChange,touched,errors,values} = useFormik({
                              <MenuItem value="male">Male</MenuItem>
                              <MenuItem value="female">Female</MenuItem>
                         </Select>
+                        {touched.gender&&errors.gender ?<span className="text-xs text-red-500">{errors.gender}</span> : null}
                     </FormControl>
                     <div>
                         <TextField
@@ -107,6 +136,7 @@ const {handleSubmit,handleChange,touched,errors,values} = useFormik({
                          onChange={handleChange}
                          size="small"
                         />
+                        {touched.address&&errors.address ?<span className="text-xs text-red-500">{errors.address}</span> : null}
                     </div>
                     <button type="submit" className="w-full h-10 rounded-md bg-indigo-500 text-white cursor-pointer">Update</button>
                 
