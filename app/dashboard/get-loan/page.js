@@ -1,6 +1,12 @@
     "use client"
 import { TextField } from "@mui/material";
+import { useFormik } from "formik";
 import { useState } from "react";
+import * as yup from "yup";
+
+ const schema = yup.object().shape({
+    amount: yup.number().required("Amount is required").min(5000),
+ });
 
 const duration = [
     {id: "30", days: 30},
@@ -13,11 +19,23 @@ export default function GetLoan () {
     const [rate,setRate] = useState(0);
     const [loanDuration,setLoanDuration] = useState(0)
 
+    const {handleSubmit,handleChange, values,touched, errors} = useFormik({
+        initialValues: {
+            amount: 0,
+        },
+        onSubmit: ()=>{
+            alert("Loan Request received")
+            alert(`You have requested a loan of ${values.amount} for ${loanDuration} days at an interest rate of ${rate}%`)
+        },
+        validationSchema:schema,
+    })
+
       return (
          <main className="min-h-screen flex justify-center py-4 md:py-6 lg:px-16">
             <div className="w-full  md:w-[350px] h-[550px] flex flex-col gap-4 p-2 border border-gray-200 rounded-md shadow-md ">
                 <h1 className="text-center text-lg font-semibold text-indigo-500">Get Instant Loan from FastCash</h1>
-                <form className="flex flex-col gap-4">
+                <form onSubmit={handleSubmit} 
+                 className="flex flex-col gap-4">
                     <div className="w-full mb-2">
                         <TextField
                         type="number"
@@ -25,8 +43,11 @@ export default function GetLoan () {
                         placeholder="Enter Loan Amount"
                         id="amount"
                         size="small"
+                        value={values.amount}
+                        onChange={handleChange}
                         className="w-full"
                         />
+                        {touched.amount && errors.amount ? <span className="text-xs text-red-500">{errors.amount}</span> : null}
                     </div>
                     <div className="border-dashed border border-indigo-600 p-4 rounded-md">
                         <p>Choose your Loan Duration</p>

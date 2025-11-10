@@ -1,6 +1,22 @@
+     "use client"
 import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { useFormik } from "formik";
+import * as yup from "yup";
 
 export default function UpdateProfile () {
+const {handleSubmit,handleChange,touched,errors,values} = useFormik({
+    initialValues: {
+        fullname: "",
+        bvn: "",
+        nin: "",
+        dob: "",
+        phone: "",
+        gender: "",
+        address: "",
+    },
+    onSubmit: ()=>{},
+})
+
     return (
         <main className="min-h-screen flex justify-center py-4 md:py-6 md:px-12 lg:py-8 lg:px-16">
             <div className="w-full md:w-[500px] h-[450px] rounded-md  shadow-md px-4 py-6">
@@ -13,6 +29,8 @@ export default function UpdateProfile () {
                         label="FullName"
                         id="fullname"
                         placeholder="Enter Your fullName"
+                        value={values.fullname}
+                        onChange={handleChange}
                         size="small"
                         />
                     </div>
@@ -23,6 +41,8 @@ export default function UpdateProfile () {
                         label="BVN"
                         id="bvn"
                         placeholder="Enter BVN"
+                        value={values.bvn}
+                        onChange={handleChange}
                         size="small"
                         />
                         <TextField
@@ -31,6 +51,8 @@ export default function UpdateProfile () {
                           label="NIN"
                           id="nin"
                           placeholder="Enter nin"
+                          value={values.nin}
+                          onChange={handleChange}
                           size="small"
                         />
                     </div>
@@ -42,6 +64,8 @@ export default function UpdateProfile () {
                         label="DOB"
                         id="dob"
                         placeholder="Enter date of birth"
+                        value={values.dob}
+                        onChange={handleChange}
                         size="small"
                         />
                         <TextField
@@ -50,6 +74,8 @@ export default function UpdateProfile () {
                          label="Phone Number"
                          id="phone"
                          placeholder="Enter your phone number"
+                         value={values.phone}
+                         onChange={handleChange}
                          size="small"
                         />
                     </div>
@@ -61,6 +87,8 @@ export default function UpdateProfile () {
                           name="gender"
                           label="Gender"
                           size="small"
+                          value={values.gender}
+                          onChange={handleChange}
                          >
                              <MenuItem value="male">Male</MenuItem>
                              <MenuItem value="female">Female</MenuItem>
@@ -75,6 +103,8 @@ export default function UpdateProfile () {
                          label="Address"
                          id="address"
                          placeholder="Enter Address"
+                         value={values.address}
+                         onChange={handleChange}
                          size="small"
                         />
                     </div>
