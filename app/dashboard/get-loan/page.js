@@ -1,7 +1,10 @@
     "use client"
+import { db } from "@/config/firebase.config";
 import { TextField } from "@mui/material";
+import { addDoc, collection } from "firebase/firestore";
 import { useFormik } from "formik";
-import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import * as yup from "yup";
 
  const schema = yup.object().shape({
@@ -15,20 +18,42 @@ const duration = [
 ]
 
 export default function GetLoan () {
+    const {data : session} = useSession();
+    console.log(session);
     const [clickedRate, setClickedRate] = useState(undefined);
     const [rate,setRate] = useState(0);
-    const [loanDuration,setLoanDuration] = useState(0)
+    const [loanDuration,setLoanDuration] = useState(0);
+    const [repayment,setRepayment] = useState(0);
 
     const {handleSubmit,handleChange, values,touched, errors} = useFormik({
         initialValues: {
             amount: 0,
         },
-        onSubmit: ()=>{
-            alert("Loan Request received")
-            alert(`You have requested a loan of ${values.amount} for ${loanDuration} days at an interest rate of ${rate}%`)
+        onSubmit: async()=>{
+            try {
+                await addDoc(collection(db, "loans"),{
+                    user: session?.user?.id,
+                    amount: values.amount,
+                    rate: rate,
+                    duration: loanDuration,
+                    repayment: repayment,
+                    timeOfRequest: new Date(), 
+                }) 
+                alert('Loan request successful')
+            }
+            catch(errors){
+                console.error("Error taking loans", errors);
+            }
+
         },
         validationSchema:schema,
     })
+    useEffect(()=>{
+        if(values.amount > 1) {
+            const Interest = (rate * values.amount) / 100 
+            setRepayment(values.amount + Interest);
+        }
+    },[values.amount,rate]);
 
       return (
          <main className="min-h-screen flex justify-center py-4 md:py-6 lg:px-16">
@@ -82,7 +107,7 @@ export default function GetLoan () {
                     </div>
                     <div className="flex flex-col gap-3 bg-linear-to-b from bg-indigo-400 to-indigo-900 border-dashed border-indigo-600 p-4  rounded-md">
                         <p className="text-indigo-200">Repayment Amount</p>
-                        <p className="text-white text-4xl">500,000</p>
+                        <p className="text-white text-4xl">₦ {repayment}</p>
                     </div>
                     <div>
                         <button type="submit" className="p-2 rounded-md bg-indigo-800 text-white uppercase">Get Loan</button>

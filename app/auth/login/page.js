@@ -1,9 +1,11 @@
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { TextField } from "@mui/material";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithubInverted } from "react-icons/vsc";
 
- export default function LoginPage () {
+ export default async function LoginPage () {
+   const session = await auth();
+   console.log(session)
       return (
          <main className="min-h-screen bg-gray-50 flex justify-center">
             <div className="w-full md:w-[350px] max-h-[400px] rounded md:shadow-md md:py-8 px-3 flex flex-col gap-5 ">
