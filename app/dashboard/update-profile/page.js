@@ -1,6 +1,10 @@
      "use client"
-import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { db } from "@/config/firebase.config";
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { addDoc, collection } from "firebase/firestore";
 import { useFormik } from "formik";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
 import * as yup from "yup";
 
  const schema = yup.object().shape({
@@ -11,10 +15,16 @@ import * as yup from "yup";
     phone: yup.number().required("Phone number is required").min(11),
     gender: yup.string().oneOf(["male","female"]).required("Gender is required"),
     address: yup.string().required("Address is required").min(10),
-
  })
 
 export default function UpdateProfile () {
+    const {data: session} = useSession();
+    const [opsProgress, setOpsProgress] = useState(false);
+    const [open, setOpen] = useState(false);
+ const handleClose = ()=>{
+    setOpen(false);
+ }
+
 const {handleSubmit,handleChange,touched,errors,values} = useFormik({
     initialValues: {
         fullname: "",
@@ -25,9 +35,29 @@ const {handleSubmit,handleChange,touched,errors,values} = useFormik({
         gender: "",
         address: "",
     },
-    onSubmit: ()=>{
-        alert("Profile updated");
-        alert(`welcome ${values.fullname}`);
+    onSubmit: async(values,{resetForm})=>{
+        setOpsProgress(true)
+        try {
+             await addDoc(collection(db,"profileDetails"),{
+                user: session?.user?.id,
+                fullname: values.fullname,
+                bvn: values.bvn,
+                nin: values.nin,
+                dob: values.dob,
+                phone: values.phone,
+                gender: values.gender,
+                address: values.address,
+                timeCreated: new Date(),
+             })
+             setOpsProgress(false)
+             setOpen(true)
+             resetForm()
+        }
+        catch(errors) {
+             setOpsProgress(false)
+             setOpen(false);
+            console.error("Error updating profile", errors);
+        }
     },
     validationSchema: schema,
 })
@@ -138,11 +168,23 @@ const {handleSubmit,handleChange,touched,errors,values} = useFormik({
                         />
                         {touched.address&&errors.address ?<span className="text-xs text-red-500">{errors.address}</span> : null}
                     </div>
-                    <button type="submit" className="w-full h-10 rounded-md bg-indigo-500 text-white cursor-pointer">Update</button>
+                    <button type="submit" className=" flex justify-center items-center gap-3 w-full h-10 rounded-md bg-indigo-500 text-white cursor-pointer">Update
+                       {opsProgress ? <CircularProgress color="inherit" size="30px"/> : null}
+                    </button>
                 
                 </form>
 
             </div>
+            {/* successDialog */}
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Success</DialogTitle>
+                <DialogContent>
+                    <Typography>Profile Updated Successfully</Typography>
+                </DialogContent>
+                <DialogActions>
+                     <Button  onClick={handleClose}  sx={{backgroundColor:"indigo"}} variant="contained">Close</Button>
+                </DialogActions>
+            </Dialog>
 
         </main>
     )
