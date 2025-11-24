@@ -45,10 +45,7 @@ import { VscGithubInverted } from "react-icons/vsc";
                         <VscGithubInverted className="text-4xl" />
                         </button>
                      </form>
-                </div> 
-
-                  
-
+                </div>
             </div>
          </main>
     )
