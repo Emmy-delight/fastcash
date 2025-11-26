@@ -1,7 +1,7 @@
   "use client"
 import { db } from "@/config/firebase.config";
-import { TextField } from "@mui/material";
-import { doc, getDoc } from "firebase/firestore";
+import { CircularProgress, TextField } from "@mui/material";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useFormik } from "formik";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -16,6 +16,7 @@ export default function Loan () {
     const [loan,setLoan] = useState(null);
     const router = useRouter();
     const [showInput,setShowInput] = useState(false);
+    const [loading,setLoading] = useState(true);
 
     useEffect(()=>{
          const fetchLoan =async ()=>{
@@ -33,6 +34,9 @@ export default function Loan () {
              catch(errors) {
                 console.error("unable to fetch",errors)
              }
+             finally {
+                setLoading(false);
+             }
          }
          fetchLoan();
     },[id])
@@ -41,9 +45,33 @@ export default function Loan () {
           initialValues : {
             repaymentAmount : ""
           },
-          onSubmit: ()=>{},
+          
+          onSubmit: async (values, {resetForm})=>{
+                const amount = Number(values.repaymentAmount);
+                const newBalance = loan?.repayment - amount;
+                 try {
+                       const loanRef = doc(db, "loans", id);
+                       await updateDoc(loanRef, {
+                         repayment : newBalance,
+                         status: newBalance === 0 ? "paid" : "ongoing",
+                       });
+                         setLoan({...loan,repayment: newBalance})
+                         setShowInput(false);
+                         resetForm(); 
+                         alert("Repayment Successful !");
+                   }
+                   catch(error) {
+                    console.error("Unable to repay", error)
+                 }
+          },
           validationSchema: schema,
      })
+      if (loading) 
+        return (
+              <div className="flex justify-center items-center h-[60vh]">
+                 <CircularProgress/>
+              </div>
+          )
     return (
         <main className="min-h-screen flex justify-center px-2 md:px-6 md:py-10 lg:px-16 lg:py-12">
             <div className="w-full md:w-[350px] max-h-auto md:rounded-md md:shadow-lg lg:px-2 lg:py-4">
@@ -67,8 +95,12 @@ export default function Loan () {
                     </div>
                     {!showInput &&(
                     <button onClick={()=>setShowInput(true)}
-                    className="w-full bg-indigo-400 h-8 text-white rounded-md shadow-md cursor-pointer hover:opacity-60">Repay Loan</button>
+                     disabled={loan?.repayment === 0}
+                    className="w-full bg-indigo-400 h-8 text-white rounded-md shadow-md cursor-pointer hover:opacity-60">
+                    {loan?.repayment === 0 ? "Loan Fully Paid": "Repay Loan"}
+                    </button>
                     )}
+
                     {showInput && (
                     <form onSubmit={handleSubmit}
                      className="flex flex-col gap-2">
@@ -83,7 +115,7 @@ export default function Loan () {
                          id="repaymentAmount"/>
                          {touched.repaymentAmount && errors.repaymentAmount ? <span className="text-xs text-red-500">{errors.repaymentAmount}</span> : null }
                         </div>
-                        <button className="w-full h-8 text-white bg-green-400 rounded-md">Make Payment</button>
+                        <button type="submit" className="w-full cursor-pointer h-8 text-white bg-green-400 rounded-md">Make Payment</button>
                     </form>
                     )}
                 </div>

@@ -1,6 +1,7 @@
     "use client"
 import { db } from "@/config/firebase.config";
-import { collection, doc, getDocs, query, where } from "firebase/firestore";
+import { Skeleton } from "@mui/material";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -8,6 +9,7 @@ import { useEffect, useState } from "react";
 export default function LoanHistory () {
     const {data: session} = useSession();
     const [loanHistory,setLoanHistory] = useState([]);
+    const [loading,setLoading] = useState(true);
 
      useEffect(()=>{
          const handleFetchLoans = async ()=>{
@@ -29,10 +31,28 @@ export default function LoanHistory () {
             catch(error){
                console.error("Error getting Loan history:",error)
             }
+            finally {
+                setLoading(false);
+            }
          }
          session ? handleFetchLoans(): null;       
      },[session])
-
+      if (loading) {
+        return (
+            <main className="min-h-screen flex justify-center">
+               <div className="flex-col flex gap-4 w-full md:w-[400px] h-[400px] shadow-md rounded-md mt-5 py-10 px-6">
+                <Skeleton sx={{width:"350px",height: "1000px"}}></Skeleton>
+                <Skeleton sx={{width:"350px",height: "1000px"}}></Skeleton>
+                <Skeleton sx={{width:"350px",height: "200px"}}></Skeleton>
+                <Skeleton sx={{width:"350px",height: "200px"}}></Skeleton>
+                <Skeleton sx={{width:"350px",height: "200px"}}></Skeleton>
+                <Skeleton sx={{width:"350px",height: "200px"}}></Skeleton>
+                <Skeleton sx={{width:"350px",height: "200px"}}></Skeleton>
+                <Skeleton sx={{width:"350px",height: "200px"}}></Skeleton>
+               </div>  
+            </main>
+        )
+      }
     return (
         <main className="min-h-screen flex justify-center px-10 py-6 md:px-7 md:py-6 lg:px-16 lg:py-10 ">
             <div className="w-full md:w-[400px] h-auto shadow-md rounded-md">
